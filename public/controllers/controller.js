@@ -2,28 +2,50 @@ var myApp = angular.module('myApp',[]);
 myApp.controller('AppCtrl',['$scope', '$http', function($scope,$http){
         console.log("hello world from contrl");
 
-        $http.get('/contactlist');
-
-        person1 ={
-            name:"andy",
-            email: "andy@gmail.com",
-            number: "9175431786",
+        var refresh = function() {
+          $http.get('/contactlist').success(function(response) {
+            console.log("I got the data I requested");
+            $scope.contactlist = response;
+            $scope.contact = "";
+          });
         };
 
-        person2 ={
-            name:"andy2",
-            email: "andy2@gmail.com",
-            number: "9175431786",
+        refresh();
+
+        $scope.addContact = function() {
+          console.log($scope.contact);
+          $http.post('/contactlist', $scope.contact).success(function(response) {
+            console.log(response);
+            refresh();
+          });
         };
 
-        person3 ={
-            name:"andy3",
-            email: "andy3@gmail.com",
-            number: "9175431786",
+        $scope.remove = function(id){
+            console.log(id)
+            $http.delete('/contactlist/' + id).success(function(response){
+                refresh();
+            });
         };
 
-        var contactList = [person1,person2,person3];
-        $scope.contactList = contactList;
+        $scope.edit = function(id){
+            console.log(id)
+            $http.get('/contactlist/' + id).success(function(response){
+                $scope.contact = response;
+            });
+        };
+
+        $scope.update = function() {
+        console.log($scope.contact._id);
+            $http.put('/contactlist/' + $scope.contact._id, $scope.contact).success(function(response) {
+            refresh();
+            })
+        };
+
+        $scope.deselect = function() {
+          $scope.contact = "";
+        }
+
+
 }]);
 
 // function AppCtrl(){
